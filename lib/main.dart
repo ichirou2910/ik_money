@@ -3,7 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ik_app/services/transaction_service.dart';
 import 'package:ik_app/theme/theme_config.dart';
-import 'package:ik_app/views/accounting/accounting_screen.dart';
+import 'package:ik_app/views/accounting/accounting_detail.dart';
+import 'package:ik_app/views/accounting/accounting_master.dart';
+import 'package:ik_app/views/main_screen.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -24,11 +26,41 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: GoRouter(routes: [
-        // TODO: change back to main screen
-        GoRoute(path: '/', builder: (ctx, state) => const AccountingScreen()),
         GoRoute(
-            path: '/accounting',
-            builder: (ctx, state) => const AccountingScreen())
+          path: '/',
+          builder: (ctx, state) => const MainScreen(),
+        ),
+        GoRoute(
+          path: '/accounting',
+          builder: (ctx, state) => const AccountingMasterView(),
+        ),
+        GoRoute(
+            path: '/accounting/transaction/:transactionId',
+            builder: (ctx, state) => AccountingDetailView(
+                  transactionId: state.pathParameters['transactionId'] ?? "0",
+                )),
+
+        // TODO: Implement these groups
+        GoRoute(
+            path: '/accounting/transaction-group',
+            builder: (ctx, state) => AccountingDetailView(
+                  transactionId: state.pathParameters['transactionId'] ?? "0",
+                )),
+        GoRoute(
+            path: '/accounting/transaction-group/:transactionGroupId',
+            builder: (ctx, state) => AccountingDetailView(
+                  transactionId: state.pathParameters['transactionId'] ?? "0",
+                )),
+        GoRoute(
+            path: '/accounting/transaction-label',
+            builder: (ctx, state) => AccountingDetailView(
+                  transactionId: state.pathParameters['transactionId'] ?? "0",
+                )),
+        GoRoute(
+            path: '/accounting/transaction-label/:transactionLabelId',
+            builder: (ctx, state) => AccountingDetailView(
+                  transactionId: state.pathParameters['transactionId'] ?? "0",
+                )),
       ]),
       themeMode: ThemeMode.system,
       theme: themeData(ThemeConfig.lightTheme),
