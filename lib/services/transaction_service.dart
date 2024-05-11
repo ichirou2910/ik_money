@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ik_app/models/transaction.dart';
+import 'package:ik_app/entities/transaction.dart';
 import 'package:ik_app/repositories/transaction_repository.dart';
 
 class TransactionService with ChangeNotifier {
@@ -10,5 +10,10 @@ class TransactionService with ChangeNotifier {
     final value = await transactionRepository.list(TransactionFilter());
     transactions = value;
     notifyListeners();
+  }
+
+  Future<Transaction?> get(int id) async {
+    final value = await transactionRepository.get(id);
+    return value;
   }
 }
