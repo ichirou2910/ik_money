@@ -8,16 +8,22 @@ class ThemeConfig {
   static Color lightBG = Colors.white;
   static Color darkBG = const Color(0xff121212);
 
-  static Color darkBlue = const Color(0xFF1E1E2C);
-  static Color lightBlue = const Color(0xFF2D2D44);
-
   static ThemeData lightTheme = ThemeData(
-    primaryColor: ThemeConfig.lightBlue,
+    primaryColor: lightPrimary,
     brightness: Brightness.light,
+    scaffoldBackgroundColor: lightBG,
+    appBarTheme: const AppBarTheme(
+      elevation: 0.0,
+    ),
   );
 
   static ThemeData darkTheme = ThemeData(
-    primaryColor: ThemeConfig.darkBlue,
+    primaryColor: darkPrimary,
     brightness: Brightness.dark,
+    colorScheme: ColorScheme.dark(secondary: darkAccent),
+    scaffoldBackgroundColor: darkBG,
+    appBarTheme: const AppBarTheme(
+      elevation: 0.0,
+    ),
   );
 }
