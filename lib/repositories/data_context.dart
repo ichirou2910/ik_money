@@ -14,8 +14,9 @@ class DataContext {
   Future<Database> _initDatabase() async {
     var databasesPath = await getDatabasesPath();
     var path = join(databasesPath, "data.db");
+    // await File(path).delete();
 
-// Check if the database exists
+    // Check if the database exists
     var exists = await databaseExists(path);
 
     if (!exists) {

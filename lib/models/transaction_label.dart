@@ -1,4 +1,4 @@
-class TransactionLabel {
+class TransactionLabelDAO {
   int id;
   String code;
   String description;
@@ -7,7 +7,7 @@ class TransactionLabel {
   String updatedAt;
   String? deletedAt;
 
-  TransactionLabel(
+  TransactionLabelDAO(
       {required this.id,
       required this.code,
       required this.description,
@@ -15,4 +15,22 @@ class TransactionLabel {
       required this.createdAt,
       required this.updatedAt,
       this.deletedAt});
+
+  TransactionLabelDAO.fromMap(Map<String, dynamic> data)
+      : id = data['id'],
+        code = data['code'],
+        description = data['description'],
+        color = data['color'],
+        createdAt = data['createdAt'],
+        updatedAt = data['updatedAt'],
+        deletedAt = data['deletedAt'];
+
+  TransactionLabelDAO.fromMappingMap(Map<String, dynamic> data)
+      : id = 0,
+        code = data['code'],
+        description = data['description'],
+        color = data['color'],
+        createdAt = data['createdAt'],
+        updatedAt = data['updatedAt'],
+        deletedAt = data['deletedAt'];
 }
