@@ -8,6 +8,7 @@ import 'package:ik_app/models/transaction_transaction_group_mapping.dart';
 import 'package:ik_app/models/transaction_transaction_label_mapping.dart';
 import 'package:ik_app/repositories/data_context.dart';
 import 'package:ik_app/utils/consts.dart';
+import 'package:sqflite/sqflite.dart' as sql;
 
 class TransactionRepository {
   final DataContext _dataContext = DataContext.instance;
@@ -122,5 +123,37 @@ class TransactionRepository {
     );
 
     return transaction;
+  }
+
+  Future<void> create(TransactionDAO transactionDAO) async {
+    final db = await _dataContext.database;
+    await db.insert(
+      Consts.DB_TRANSACTION,
+      transactionDAO.toMap(),
+      conflictAlgorithm: sql.ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<void> update(TransactionDAO transactionDAO) async {
+    final db = await _dataContext.database;
+    await db.update(
+      Consts.DB_TRANSACTION,
+      transactionDAO.toMap(),
+      where: 'id = ?',
+      whereArgs: [transactionDAO.id],
+    );
+  }
+
+  Future<void> delete(int id) async {
+    final db = await _dataContext.database;
+    var map = {
+      'deletedAt': DateTime.now().toString(),
+    };
+    await db.update(
+      Consts.DB_TRANSACTION,
+      map,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }
