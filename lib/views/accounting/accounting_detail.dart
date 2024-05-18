@@ -1,9 +1,6 @@
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/entities/transaction_state.dart';
-import 'package:ik_app/entities/transaction_transaction_group_mapping.dart';
-import 'package:ik_app/entities/transaction_transaction_label_mapping.dart';
 import 'package:ik_app/services/transaction_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -20,214 +17,206 @@ class AccountingDetailView extends StatefulWidget {
 }
 
 class _AccountingDetailViewState extends State<AccountingDetailView> {
+  final DateFormat dateFormat = DateFormat("dd/MM/yyyy");
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _timeController = TextEditingController();
+  bool _isPending = false;
+
+  // Read-only fields
+  DateTime createdAt = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    if (widget.transactionId <= 0) {
+      return;
+    }
+
+    var response = await Provider.of<TransactionService>(context, listen: false)
+        .get(widget.transactionId);
+    if (response == null) {
+      return;
+    }
+    var data = response;
+    createdAt = data.createdAt;
+    setState(() {
+      _amountController.text = data.amount.toString();
+      _descriptionController.text = data.description;
+      _timeController.text = dateFormat.format(data.time);
+      _isPending = data.transactionStateId == 0;
+    });
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text("Delete transaction"),
+              content: const Text(
+                  "Are you sure you want to delete this transaction?"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    context.pop();
+                  },
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    context.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      _buildSnackbar("Deleting..."),
+                    );
+                    await Provider.of<TransactionService>(context,
+                            listen: false)
+                        .delete(widget.transactionId);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      context.go("/accounting");
+                    }
+                  },
+                  child: const Text("Delete"),
+                ),
+              ],
+            ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Transaction details"),
+        title: widget.transactionId > 0
+            ? const Text("Edit Transaction")
+            : const Text("New Transaction"),
+        actions: widget.transactionId > 0
+            ? [
+                IconButton(
+                  onPressed: () => _confirmDelete(context),
+                  icon: const Icon(Icons.delete),
+                ),
+              ]
+            : [],
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: FutureBuilder(
-          future: Provider.of<TransactionService>(context, listen: false)
-              .get(widget.transactionId),
-          builder: (ctx, snap) => snap.connectionState ==
-                  ConnectionState.waiting
-              ? const Center(child: CircularProgressIndicator())
-              : snap.hasData
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInfoCard(snap.data as Transaction),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                        _buildLabels(
-                            snap.data?.transactionTransactionLabelMappings
-                                as List<TransactionTransactionLabelMapping>),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
-                        _buildGroups(
-                            snap.data?.transactionTransactionGroupMappings
-                                as List<TransactionTransactionGroupMapping>),
-                      ],
-                    )
-                  : const Center(child: Text('Empty')),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(Transaction data) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-        child: Column(
-          children: [
-            // Amount
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Amount',
-                  style: TextStyle(fontSize: 17),
-                ),
-                Text(
-                  NumberFormat.simpleCurrency(locale: 'vi_VN', decimalDigits: 0)
-                      .format(data.amount),
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: (data.amount) > 0 ? Colors.green : Colors.red,
-                  ),
-                ),
-              ],
-            ),
-            // Date
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Date',
-                  style: TextStyle(fontSize: 17),
-                ),
-                Text(
-                  DateFormat('dd/MM/yyyy').format(data.time),
-                  style: const TextStyle(fontSize: 17),
-                ),
-              ],
-            ),
-            // Date
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'State',
-                  style: TextStyle(fontSize: 17),
-                ),
-                Text(
-                  TransactionStateEnum.transactionStates
-                      .firstWhere((e) => e.id == data.transactionStateId)
-                      .name,
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: data.transactionStateId ==
-                            TransactionStateEnum.pending.id
-                        ? Colors.grey
-                        : Colors.green,
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 10.0),
-              child: DottedLine(
-                dashColor: Theme.of(context).dividerColor,
+        padding: const EdgeInsets.all(8.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _amountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: "Amount"),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Required";
+                  }
+                  return null;
+                },
               ),
-            ),
-            // Description
-            Row(
-              children: [
-                Text(
-                  data.description,
-                  style: const TextStyle(fontSize: 17),
-                ),
-              ],
-            )
-          ],
+              TextFormField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(labelText: "Description"),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Required";
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _timeController,
+                decoration: const InputDecoration(labelText: 'Time'),
+                readOnly: true,
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null) {
+                    setState(() {
+                      _timeController.text = dateFormat.format(pickedDate);
+                    });
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a date';
+                  }
+                  return null;
+                },
+              ),
+              CheckboxListTile(
+                title: const Text('Pending'),
+                value: _isPending,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    _isPending = newValue ?? false;
+                  });
+                },
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      _buildSnackbar("Saving..."),
+                    );
+
+                    final Transaction transaction = Transaction(
+                      id: widget.transactionId,
+                      amount: int.parse(_amountController.text),
+                      description: _descriptionController.text,
+                      time: dateFormat.parse(_timeController.text),
+                      transactionStateId: _isPending ? 0 : 1,
+                      createdAt: createdAt,
+                      updatedAt: DateTime.now(),
+                    );
+                    if (transaction.id > 0) {
+                      await Provider.of<TransactionService>(context,
+                              listen: false)
+                          .update(transaction);
+                    } else {
+                      await Provider.of<TransactionService>(context,
+                              listen: false)
+                          .create(transaction);
+                    }
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      context.go("/accounting");
+                    }
+                  }
+                },
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildLabels(List<TransactionTransactionLabelMapping> mappings) {
-    return mappings.isNotEmpty
-        ? SizedBox(
-            height: 25.0,
-            child: ListView.builder(
-              primary: false,
-              scrollDirection: Axis.horizontal,
-              itemCount: mappings.length,
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 5.0, vertical: 0.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color(int.parse(
-                              mappings[index]
-                                  .transactionLabel
-                                  .color
-                                  .substring(1, 7),
-                              radix: 16) +
-                          0xFF000000),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(20.0),
-                      ),
-                    ),
-                    child: InkWell(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(20.0),
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                            mappings[index].transactionLabel.code,
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          )
-        : const SizedBox(height: 0);
-  }
-
-  Widget _buildGroups(List<TransactionTransactionGroupMapping> mappings) {
-    return mappings.isNotEmpty
-        ? Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                const Text("Transaction Groups"),
-                ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: mappings.length,
-                  itemBuilder: (ctx, idx) {
-                    return InkWell(
-                      onTap: () {
-                        // TODO: navigate to group
-                      },
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(0),
-                        title: Text(
-                          mappings[idx].transactionGroup.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 17),
-                        ),
-                        subtitle: Text(
-                            mappings[idx].transactionGroup.description,
-                            style: const TextStyle(fontSize: 12)),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: () {},
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          )
-        : Container();
+  SnackBar _buildSnackbar(String content) {
+    return SnackBar(
+      duration: const Duration(days: 1),
+      content: Row(
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(width: 20),
+          Text(content),
+        ],
+      ),
+    );
   }
 }

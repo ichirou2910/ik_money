@@ -29,15 +29,18 @@ class TransactionDAO {
         deletedAt = data['deletedAt'];
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
+    var map = {
       'amount': amount,
       'description': description,
-      'time': time.toString(),
+      'time': time,
       'transactionStateId': transactionStateId,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'deletedAt': deletedAt
     };
+    if (id > 0) {
+      map['id'] = id;
+    }
+    return map;
   }
 }

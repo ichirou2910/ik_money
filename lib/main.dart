@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ik_app/services/transaction_service.dart';
 import 'package:ik_app/theme/theme_config.dart';
 import 'package:ik_app/views/accounting/accounting_detail.dart';
+import 'package:ik_app/views/accounting/accounting_preview.dart';
 import 'package:ik_app/views/accounting/accounting_master.dart';
 import 'package:ik_app/views/main_screen.dart';
 import 'package:provider/provider.dart';
@@ -29,13 +30,16 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/',
           builder: (ctx, state) => const MainScreen(),
+          // builder: (ctx, state) => const AccountingMasterView(),
+          // builder: (ctx, state) => const AccountingDetailView(),
+          // builder: (ctx, state) => AccountingPreviewView(transactionId: "1"),
         ),
         GoRoute(
           path: '/accounting',
           builder: (ctx, state) => const AccountingMasterView(),
         ),
         GoRoute(
-            path: '/accounting/transaction/:transactionId',
+            path: '/accounting/transaction-edit/:transactionId',
             builder: (ctx, state) => AccountingDetailView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
