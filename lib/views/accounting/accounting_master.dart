@@ -12,6 +12,15 @@ class AccountingMasterView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text("Transactions"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              // await _showNotification(context);
+              Provider.of<TransactionService>(context, listen: false).list();
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -49,6 +58,11 @@ class AccountingMasterView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => context.push("/accounting/transaction-edit/0"),
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add),
       ),
     );
   }
