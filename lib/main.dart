@@ -43,22 +43,22 @@ class MyApp extends StatelessWidget {
         // TODO: Implement these groups
         GoRoute(
             path: '/accounting/transaction-group',
-            builder: (ctx, state) => AccountingDetailView(
+            builder: (ctx, state) => AccountingPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
         GoRoute(
             path: '/accounting/transaction-group/:transactionGroupId',
-            builder: (ctx, state) => AccountingDetailView(
+            builder: (ctx, state) => AccountingPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
         GoRoute(
             path: '/accounting/transaction-label',
-            builder: (ctx, state) => AccountingDetailView(
+            builder: (ctx, state) => AccountingPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
         GoRoute(
             path: '/accounting/transaction-label/:transactionLabelId',
-            builder: (ctx, state) => AccountingDetailView(
+            builder: (ctx, state) => AccountingPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
       ]),
