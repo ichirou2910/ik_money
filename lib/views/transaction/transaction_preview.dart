@@ -9,18 +9,18 @@ import 'package:ik_app/services/transaction_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class AccountingPreviewView extends StatefulWidget {
+class TransactionPreviewView extends StatefulWidget {
   final int transactionId;
 
-  AccountingPreviewView({super.key, required String transactionId})
+  TransactionPreviewView({super.key, required String transactionId})
       : transactionId = int.parse(transactionId),
         super();
 
   @override
-  State<AccountingPreviewView> createState() => _AccountingPreviewViewState();
+  State<TransactionPreviewView> createState() => _TransactionPreviewViewState();
 }
 
-class _AccountingPreviewViewState extends State<AccountingPreviewView> {
+class _TransactionPreviewViewState extends State<TransactionPreviewView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +31,7 @@ class _AccountingPreviewViewState extends State<AccountingPreviewView> {
           IconButton(
             onPressed: () {
               context
-                  .push("/accounting/transaction-edit/${widget.transactionId}");
+                  .push("/transaction-edit/${widget.transactionId}");
             },
             icon: const Icon(Icons.edit),
           )

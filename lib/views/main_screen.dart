@@ -1,36 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
-class Menu {
-  final String name;
-  final String description;
-  final String url;
-  final Icon icon;
-
-  const Menu({
-    required this.name,
-    required this.description,
-    required this.url,
-    required this.icon,
-  });
-}
+import 'package:ik_app/views/transaction/transaction_master.dart';
 
 class MainScreen extends StatefulWidget {
-  final List<Menu> menus = const [
-    Menu(
-      name: "Accounting",
-      description: "Manage your transactions",
-      url: "/accounting",
-      icon: Icon(Icons.money),
-    ),
-    Menu(
-      name: "Notes",
-      description: "Manage your notes",
-      url: "/accounting",
-      icon: Icon(Icons.notes),
-    ),
-  ];
-
   const MainScreen({super.key});
 
   @override
@@ -38,44 +9,57 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  PageController _pageController = PageController(initialPage: 0);
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _pageController.jumpToPage(index);
+    });
+  }
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _pageController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text("Home"),
+      body: PageView(
+        physics: const NeverScrollableScrollPhysics(),
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: const [
+          TransactionMasterView(),
+        ],
       ),
-      body: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-              child: Text(
-                "Welcome, Ichirou.",
-                style: TextStyle(fontSize: 30),
-              ),
-            ),
-            ..._buildMenus(widget.menus, context)
-          ],
-        ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.money),
+            label: 'Transactions',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.group),
+            label: 'Groups',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.label),
+            label: 'Labels',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
-  }
-
-  List<Widget> _buildMenus(List<Menu> menus, BuildContext context) {
-    return menus
-        .map(
-          (m) => ListTile(
-            onTap: () {
-              context.push(m.url);
-            },
-            title: Text(m.name, style: const TextStyle(fontSize: 18)),
-            subtitle: Text(m.description),
-            leading: m.icon,
-          ),
-        )
-        .toList();
   }
 }

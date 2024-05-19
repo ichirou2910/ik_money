@@ -5,18 +5,18 @@ import 'package:ik_app/services/transaction_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class AccountingDetailView extends StatefulWidget {
+class TransactionDetailView extends StatefulWidget {
   final int transactionId;
 
-  AccountingDetailView({super.key, required String transactionId})
+  TransactionDetailView({super.key, required String transactionId})
       : transactionId = int.parse(transactionId),
         super();
 
   @override
-  State<AccountingDetailView> createState() => _AccountingDetailViewState();
+  State<TransactionDetailView> createState() => _TransactionDetailViewState();
 }
 
-class _AccountingDetailViewState extends State<AccountingDetailView> {
+class _TransactionDetailViewState extends State<TransactionDetailView> {
   final DateFormat dateFormat = DateFormat("dd/MM/yyyy");
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
@@ -78,7 +78,8 @@ class _AccountingDetailViewState extends State<AccountingDetailView> {
                         .delete(widget.transactionId);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      context.go("/accounting");
+                      context.pop();
+                      context.pop();
                     }
                   },
                   child: const Text("Delete"),
@@ -194,7 +195,7 @@ class _AccountingDetailViewState extends State<AccountingDetailView> {
 
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      context.go("/accounting");
+                      context.pop();
                     }
                   }
                 },

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ik_app/services/transaction_service.dart';
-import 'package:ik_app/views/accounting/transaction_card.dart';
+import 'package:ik_app/views/transaction/transaction_card.dart';
 import 'package:provider/provider.dart';
 
-class AccountingMasterView extends StatelessWidget {
-  const AccountingMasterView({super.key});
+class TransactionMasterView extends StatefulWidget {
+  const TransactionMasterView({super.key});
+
+  @override
+  State<TransactionMasterView> createState() => _TransactionMasterViewState();
+}
+
+class _TransactionMasterViewState extends State<TransactionMasterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +54,7 @@ class AccountingMasterView extends StatelessWidget {
                                   itemCount: provider.transactions.length,
                                   itemBuilder: (ctx, i) => GestureDetector(
                                     onTap: () => context.push(
-                                        "/accounting/transaction/${provider.transactions[i].id}"),
+                                        "/transaction/${provider.transactions[i].id}"),
                                     child: TransactionCard(
                                       transaction: provider.transactions[i],
                                     ),
@@ -60,7 +66,7 @@ class AccountingMasterView extends StatelessWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push("/accounting/transaction-edit/0"),
+        onPressed: () => context.push("/transaction-edit/0"),
         shape: const CircleBorder(),
         child: const Icon(Icons.add),
       ),

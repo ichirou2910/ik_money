@@ -3,9 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ik_app/services/transaction_service.dart';
 import 'package:ik_app/theme/theme_config.dart';
-import 'package:ik_app/views/accounting/accounting_detail.dart';
-import 'package:ik_app/views/accounting/accounting_preview.dart';
-import 'package:ik_app/views/accounting/accounting_master.dart';
+import 'package:ik_app/views/transaction/transaction_detail.dart';
+import 'package:ik_app/views/transaction/transaction_preview.dart';
 import 'package:ik_app/views/main_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -30,44 +29,38 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/',
           builder: (ctx, state) => const MainScreen(),
-          // builder: (ctx, state) => const AccountingMasterView(),
-          // builder: (ctx, state) => const AccountingDetailView(),
-          // builder: (ctx, state) => AccountingPreviewView(transactionId: "1"),
         ),
         GoRoute(
-          path: '/accounting',
-          builder: (ctx, state) => const AccountingMasterView(),
-        ),
-        GoRoute(
-            path: '/accounting/transaction-edit/:transactionId',
-            builder: (ctx, state) => AccountingDetailView(
+            path: '/transaction-edit/:transactionId',
+            builder: (ctx, state) => TransactionDetailView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
         GoRoute(
-            path: '/accounting/transaction/:transactionId',
-            builder: (ctx, state) => AccountingPreviewView(
+            path: '/transaction/:transactionId',
+            builder: (ctx, state) => TransactionPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
 
         // TODO: Implement these groups
         GoRoute(
-            path: '/accounting/transaction-group',
-            builder: (ctx, state) => AccountingPreviewView(
+            path: '/transaction-group',
+            builder: (ctx, state) => TransactionPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
         GoRoute(
-            path: '/accounting/transaction-group/:transactionGroupId',
-            builder: (ctx, state) => AccountingPreviewView(
+            path: '/transaction-group/:transactionGroupId',
+            builder: (ctx, state) => TransactionPreviewView(
+                  transactionId: state.pathParameters['transactionId'] ?? "0",
+                )),
+
+        GoRoute(
+            path: '/transaction-label',
+            builder: (ctx, state) => TransactionPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
         GoRoute(
-            path: '/accounting/transaction-label',
-            builder: (ctx, state) => AccountingPreviewView(
-                  transactionId: state.pathParameters['transactionId'] ?? "0",
-                )),
-        GoRoute(
-            path: '/accounting/transaction-label/:transactionLabelId',
-            builder: (ctx, state) => AccountingPreviewView(
+            path: '/transaction-label/:transactionLabelId',
+            builder: (ctx, state) => TransactionPreviewView(
                   transactionId: state.pathParameters['transactionId'] ?? "0",
                 )),
       ]),
