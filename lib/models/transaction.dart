@@ -1,6 +1,7 @@
 class TransactionDAO {
   int id;
   int amount;
+  String title;
   String description;
   String time;
   int transactionStateId;
@@ -8,19 +9,22 @@ class TransactionDAO {
   String updatedAt;
   String? deletedAt;
 
-  TransactionDAO(
-      {required this.id,
-      required this.amount,
-      required this.description,
-      required this.time,
-      required this.transactionStateId,
-      required this.createdAt,
-      required this.updatedAt,
-      this.deletedAt});
+  TransactionDAO({
+    this.id = 0,
+    this.amount = 0,
+    this.title = "",
+    this.description = "",
+    this.time = "",
+    this.transactionStateId = 0,
+    this.createdAt = "",
+    this.updatedAt = "",
+    this.deletedAt,
+  });
 
   TransactionDAO.fromMap(Map<String, dynamic> data)
       : id = data['id'],
         amount = data['amount'],
+        title = data['title'],
         description = data['description'],
         time = data['time'],
         transactionStateId = data['transactionStateId'],
@@ -31,6 +35,7 @@ class TransactionDAO {
   Map<String, dynamic> toMap() {
     var map = {
       'amount': amount,
+      'title': title,
       'description': description,
       'time': time,
       'transactionStateId': transactionStateId,

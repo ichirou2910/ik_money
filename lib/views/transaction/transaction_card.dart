@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/entities/transaction_state.dart';
 import 'package:intl/intl.dart';
+
+import '../../entities/transaction.dart';
+import '../../entities/transaction_state.dart';
 
 class TransactionCard extends StatelessWidget {
   final Transaction transaction;
@@ -73,7 +74,7 @@ class TransactionCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  transaction.description,
+                  transaction.title,
                   style: const TextStyle(
                     fontSize: 16,
                   ),

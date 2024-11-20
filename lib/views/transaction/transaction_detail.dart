@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/services/transaction_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import '../../entities/transaction.dart';
+import '../../services/transaction_service.dart';
 
 class TransactionDetailView extends StatefulWidget {
   final int transactionId;
@@ -20,6 +21,7 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
   final DateFormat dateFormat = DateFormat("dd/MM/yyyy");
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _timeController = TextEditingController();
   bool _isPending = false;
@@ -47,6 +49,7 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
     createdAt = data.createdAt;
     setState(() {
       _amountController.text = data.amount.toString();
+      _titleController.text = data.title;
       _descriptionController.text = data.description;
       _timeController.text = dateFormat.format(data.time);
       _isPending = data.transactionStateId == 0;
@@ -124,14 +127,20 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                 },
               ),
               TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(labelText: "Description"),
+                controller: _titleController,
+                decoration: const InputDecoration(labelText: "Title"),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return "Required";
                   }
                   return null;
                 },
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                controller: _descriptionController,
+                decoration: const InputDecoration(labelText: "Description"),
               ),
               TextFormField(
                 controller: _timeController,
@@ -177,11 +186,9 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                     final Transaction transaction = Transaction(
                       id: widget.transactionId,
                       amount: int.parse(_amountController.text),
-                      description: _descriptionController.text,
+                      title: _titleController.text,
                       time: dateFormat.parse(_timeController.text),
                       transactionStateId: _isPending ? 0 : 1,
-                      createdAt: createdAt,
-                      updatedAt: DateTime.now(),
                     );
                     if (transaction.id > 0) {
                       await Provider.of<TransactionService>(context,

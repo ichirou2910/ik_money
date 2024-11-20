@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/models/transaction.dart';
-import 'package:ik_app/repositories/transaction_repository.dart';
+
+import '../entities/transaction.dart';
+import '../models/transaction.dart';
+import '../repositories/transaction_repository.dart';
 
 class TransactionService with ChangeNotifier {
   List<Transaction> transactions = [];
@@ -20,9 +21,8 @@ class TransactionService with ChangeNotifier {
 
   Future<void> create(Transaction transaction) async {
     final TransactionDAO transactionDAO = TransactionDAO(
-      id: 0,
       amount: transaction.amount,
-      description: transaction.description,
+      title: transaction.title,
       time: transaction.time.toString(),
       transactionStateId: transaction.transactionStateId,
       createdAt: DateTime.now().toString(),
@@ -35,7 +35,7 @@ class TransactionService with ChangeNotifier {
     final TransactionDAO transactionDAO = TransactionDAO(
       id: transaction.id,
       amount: transaction.amount,
-      description: transaction.description,
+      title: transaction.title,
       time: transaction.time.toString(),
       transactionStateId: transaction.transactionStateId,
       createdAt: transaction.createdAt.toString(),

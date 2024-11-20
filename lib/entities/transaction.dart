@@ -1,10 +1,12 @@
-import 'package:ik_app/entities/filters.dart';
-import 'package:ik_app/entities/transaction_transaction_group_mapping.dart';
-import 'package:ik_app/entities/transaction_transaction_label_mapping.dart';
+import '../entities/filters.dart';
+import '../entities/transaction_transaction_group_mapping.dart';
+import '../entities/transaction_transaction_label_mapping.dart';
+import '../utils/consts.dart';
 
 class Transaction {
   int id;
   int amount;
+  String title;
   String description;
   DateTime time;
   int transactionStateId;
@@ -15,17 +17,20 @@ class Transaction {
   List<TransactionTransactionGroupMapping> transactionTransactionGroupMappings;
 
   Transaction({
-    required this.id,
-    required this.amount,
-    required this.description,
-    required this.time,
-    required this.transactionStateId,
-    required this.createdAt,
-    required this.updatedAt,
+    this.id = 0,
+    this.amount = 0,
+    this.title = "",
+    this.description = "",
+    time,
+    this.transactionStateId = 0,
+    createdAt,
+    updatedAt,
     this.deletedAt,
     this.transactionTransactionLabelMappings = const [],
     this.transactionTransactionGroupMappings = const [],
-  });
+  })  : time = time ?? Consts.DATE_TIME_DEFAULT,
+        createdAt = createdAt ?? Consts.DATE_TIME_DEFAULT,
+        updatedAt = updatedAt ?? Consts.DATE_TIME_DEFAULT;
 }
 
 class TransactionFilter {

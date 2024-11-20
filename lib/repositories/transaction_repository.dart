@@ -1,14 +1,17 @@
-import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/entities/transaction_group.dart';
-import 'package:ik_app/entities/transaction_label.dart';
-import 'package:ik_app/entities/transaction_transaction_group_mapping.dart';
-import 'package:ik_app/entities/transaction_transaction_label_mapping.dart';
-import 'package:ik_app/models/transaction.dart';
-import 'package:ik_app/models/transaction_transaction_group_mapping.dart';
-import 'package:ik_app/models/transaction_transaction_label_mapping.dart';
-import 'package:ik_app/repositories/data_context.dart';
-import 'package:ik_app/utils/consts.dart';
 import 'package:sqflite/sqflite.dart' as sql;
+
+import '../entities/transaction.dart';
+import '../entities/transaction_group.dart';
+import '../entities/transaction_label.dart';
+import '../entities/transaction_transaction_group_mapping.dart';
+import '../entities/transaction_transaction_label_mapping.dart';
+import '../models/transaction.dart';
+import '../models/transaction_group.dart';
+import '../models/transaction_label.dart';
+import '../models/transaction_transaction_group_mapping.dart';
+import '../models/transaction_transaction_label_mapping.dart';
+import '../utils/consts.dart';
+import 'data_context.dart';
 
 class TransactionRepository {
   final DataContext _dataContext = DataContext.instance;
@@ -29,12 +32,12 @@ class TransactionRepository {
         .map((e) => Transaction(
               id: e.id,
               amount: e.amount,
+              title: e.title,
               description: e.description,
               time: DateTime.parse(e.time),
               transactionStateId: e.transactionStateId,
               createdAt: DateTime.parse(e.createdAt),
               updatedAt: DateTime.parse(e.updatedAt),
-              deletedAt: DateTime.tryParse(e.deletedAt ?? ""),
             ))
         .toList();
 
@@ -61,30 +64,48 @@ class TransactionRepository {
         transactionQuery.map((e) => TransactionDAO.fromMap(e)).toList().first;
 
     var labelQuery = await db.rawQuery('''
-      SELECT ttlm.*, tl.code, tl.description, tl.color, tl.createdAt, tl.updatedAt
+      SELECT ttlm.*, tl.code, tl.description, tl.color
       FROM ${Consts.DB_TRANSACTION_TRANSACTION_LABEL_MAPPING} AS ttlm
       LEFT JOIN ${Consts.DB_TRANSACTION_LABEL} AS tl ON ttlm.transaction_label_id = tl.id
       WHERE ttlm.transaction_id = $id
     ''');
     List<TransactionTransactionLabelMappingDAO>
         transactionTransactionLabelMappingDAOs = labelQuery
-            .map((e) => TransactionTransactionLabelMappingDAO.fromMap(e))
+            .map((Map<String, dynamic> e) =>
+                TransactionTransactionLabelMappingDAO(
+                  transactionId: e['transaction_id'],
+                  transactionLabelId: e['transaction_label_id'],
+                  transactionLabel: TransactionLabelDAO(
+                    code: e['code'],
+                    description: e['description'],
+                    color: e['color'],
+                  ),
+                ))
             .toList();
 
     var groupQuery = await db.rawQuery('''
-      SELECT ttgm.*, tl.name, tl.description, tl.createdAt, tl.updatedAt
+      SELECT ttgm.*, tg.name, tg.description
       FROM ${Consts.DB_TRANSACTION_TRANSACTION_GROUP_MAPPING} AS ttgm
-      LEFT JOIN ${Consts.DB_TRANSACTION_GROUP} AS tl ON ttgm.transaction_group_id = tl.id
+      LEFT JOIN ${Consts.DB_TRANSACTION_GROUP} AS tg ON ttgm.transaction_group_id = tg.id
       WHERE ttgm.transaction_id = $id
     ''');
     List<TransactionTransactionGroupMappingDAO>
         transactionTransactionGroupMappingDAOs = groupQuery
-            .map((e) => TransactionTransactionGroupMappingDAO.fromMap(e))
+            .map((Map<String, dynamic> e) =>
+                TransactionTransactionGroupMappingDAO(
+                  transactionId: e['transaction_id'],
+                  transactionGroupId: e['transaction_group_id'],
+                  transactionGroup: TransactionGroupDAO(
+                    name: e['name'],
+                    description: e['description'],
+                  ),
+                ))
             .toList();
 
     Transaction transaction = Transaction(
       id: transactionDAO.id,
       amount: transactionDAO.amount,
+      title: transactionDAO.title,
       description: transactionDAO.description,
       time: DateTime.parse(transactionDAO.time),
       transactionStateId: transactionDAO.transactionStateId,
@@ -97,12 +118,9 @@ class TransactionRepository {
                     transactionId: e.transactionId,
                     transactionLabelId: e.transactionLabelId,
                     transactionLabel: TransactionLabel(
-                      id: e.transactionLabel.id,
                       code: e.transactionLabel.code,
                       description: e.transactionLabel.description,
                       color: e.transactionLabel.color,
-                      createdAt: e.transactionLabel.createdAt,
-                      updatedAt: e.transactionLabel.updatedAt,
                     ),
                   ))
               .toList(),
@@ -112,11 +130,8 @@ class TransactionRepository {
                     transactionId: e.transactionId,
                     transactionGroupId: e.transactionGroupId,
                     transactionGroup: TransactionGroup(
-                      id: e.transactionGroup.id,
                       name: e.transactionGroup.name,
                       description: e.transactionGroup.description,
-                      createdAt: e.transactionGroup.createdAt,
-                      updatedAt: e.transactionGroup.updatedAt,
                     ),
                   ))
               .toList(),
