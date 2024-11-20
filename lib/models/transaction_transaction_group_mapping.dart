@@ -1,18 +1,23 @@
-import 'package:ik_app/models/transaction_group.dart';
+import '../models/transaction.dart';
+import '../models/transaction_group.dart';
 
 class TransactionTransactionGroupMappingDAO {
   int transactionId;
   int transactionGroupId;
+  TransactionDAO transaction;
   TransactionGroupDAO transactionGroup;
 
   TransactionTransactionGroupMappingDAO({
-    required this.transactionId,
-    required this.transactionGroupId,
-    required this.transactionGroup,
-  });
+    this.transactionId = 0,
+    this.transactionGroupId = 0,
+    transaction,
+    transactionGroup,
+  })  : transaction = transaction ?? TransactionDAO(),
+        transactionGroup = transactionGroup ?? TransactionGroupDAO();
 
   TransactionTransactionGroupMappingDAO.fromMap(Map<String, dynamic> data)
       : transactionId = data['transaction_id'],
         transactionGroupId = data['transaction_group_id'],
-        transactionGroup = TransactionGroupDAO.fromMappingMap(data);
+        transactionGroup = TransactionGroupDAO(),
+        transaction = TransactionDAO();
 }

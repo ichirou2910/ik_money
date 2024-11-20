@@ -6,9 +6,9 @@ class TransactionStateEnum {
   final Color color;
 
   TransactionStateEnum({
-    required this.id,
-    required this.name,
-    required this.color,
+    this.id = 0,
+    this.name = "",
+    this.color = const Color.fromRGBO(0, 0, 0, 1),
   });
 
   static TransactionStateEnum pending =

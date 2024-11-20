@@ -1,18 +1,22 @@
+import '../utils/consts.dart';
+
 class TransactionLabel {
   int id;
   String code;
   String description;
   String color;
-  String createdAt;
-  String updatedAt;
-  String? deletedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
+  DateTime? deletedAt;
 
-  TransactionLabel(
-      {required this.id,
-      required this.code,
-      required this.description,
-      required this.color,
-      required this.createdAt,
-      required this.updatedAt,
-      this.deletedAt});
+  TransactionLabel({
+    this.id = 0,
+    this.code = "",
+    this.description = "",
+    this.color = "",
+    createdAt,
+    updatedAt,
+    this.deletedAt,
+  })  : createdAt = createdAt ?? Consts.DATE_TIME_DEFAULT,
+        updatedAt = updatedAt ?? Consts.DATE_TIME_DEFAULT;
 }

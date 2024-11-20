@@ -1,16 +1,17 @@
-import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/entities/transaction_group.dart';
+import '../entities/transaction.dart';
+import '../entities/transaction_group.dart';
 
 class TransactionTransactionGroupMapping {
   int transactionId;
   int transactionGroupId;
-  Transaction? transaction;
+  Transaction transaction;
   TransactionGroup transactionGroup;
 
   TransactionTransactionGroupMapping({
-    required this.transactionId,
-    required this.transactionGroupId,
-    this.transaction,
-    required this.transactionGroup,
-  });
+    this.transactionId = 0,
+    this.transactionGroupId = 0,
+    transaction,
+    transactionGroup,
+  })  : transaction = transaction ?? Transaction(),
+        transactionGroup = transactionGroup ?? TransactionGroup();
 }

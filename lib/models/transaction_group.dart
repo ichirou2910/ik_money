@@ -6,13 +6,14 @@ class TransactionGroupDAO {
   String updatedAt;
   String? deletedAt;
 
-  TransactionGroupDAO(
-      {required this.id,
-      required this.name,
-      required this.description,
-      required this.createdAt,
-      required this.updatedAt,
-      this.deletedAt});
+  TransactionGroupDAO({
+    this.id = 0,
+    this.name = "",
+    this.description = "",
+    this.createdAt = "",
+    this.updatedAt = "",
+    this.deletedAt,
+  });
 
   TransactionGroupDAO.fromMap(Map<String, dynamic> data)
       : id = data['id'],
@@ -22,11 +23,14 @@ class TransactionGroupDAO {
         updatedAt = data['updatedAt'],
         deletedAt = data['deletedAt'];
 
-  TransactionGroupDAO.fromMappingMap(Map<String, dynamic> data)
-      : id = 0,
-        name = data['name'],
-        description = data['description'],
-        createdAt = data['createdAt'],
-        updatedAt = data['updatedAt'],
-        deletedAt = data['deletedAt'];
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'deletedAt': deletedAt
+    };
+  }
 }

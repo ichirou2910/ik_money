@@ -1,13 +1,14 @@
 import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/entities/transaction_state.dart';
-import 'package:ik_app/entities/transaction_transaction_group_mapping.dart';
-import 'package:ik_app/entities/transaction_transaction_label_mapping.dart';
-import 'package:ik_app/services/transaction_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import '../../entities/transaction.dart';
+import '../../entities/transaction_state.dart';
+import '../../entities/transaction_transaction_group_mapping.dart';
+import '../../entities/transaction_transaction_label_mapping.dart';
+import '../../services/transaction_service.dart';
 
 class TransactionPreviewView extends StatefulWidget {
   final int transactionId;
@@ -30,8 +31,7 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
         actions: [
           IconButton(
             onPressed: () {
-              context
-                  .push("/transaction-edit/${widget.transactionId}");
+              context.push("/transaction-edit/${widget.transactionId}");
             },
             icon: const Icon(Icons.edit),
           )
@@ -140,7 +140,7 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
             Row(
               children: [
                 Text(
-                  data.description,
+                  data.title,
                   style: const TextStyle(fontSize: 17),
                 ),
               ],

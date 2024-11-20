@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ik_app/services/transaction_service.dart';
-import 'package:ik_app/views/transaction/transaction_card.dart';
 import 'package:provider/provider.dart';
+
+import '../../services/transaction_service.dart';
+import '../../views/transaction/transaction_card.dart';
 
 class TransactionMasterView extends StatefulWidget {
   const TransactionMasterView({super.key});

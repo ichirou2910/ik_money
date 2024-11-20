@@ -1,16 +1,17 @@
-import 'package:ik_app/entities/transaction.dart';
-import 'package:ik_app/entities/transaction_label.dart';
+import '../entities/transaction.dart';
+import '../entities/transaction_label.dart';
 
 class TransactionTransactionLabelMapping {
   int transactionId;
   int transactionLabelId;
-  Transaction? transaction;
+  Transaction transaction;
   TransactionLabel transactionLabel;
 
   TransactionTransactionLabelMapping({
-    required this.transactionId,
-    required this.transactionLabelId,
-    this.transaction,
-    required this.transactionLabel,
-  });
+    this.transactionId = 0,
+    this.transactionLabelId = 0,
+    transaction,
+    transactionLabel,
+  })  : transaction = transaction ?? Transaction(),
+        transactionLabel = transactionLabel ?? TransactionLabel();
 }
