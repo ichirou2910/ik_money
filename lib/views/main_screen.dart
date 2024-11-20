@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ik_app/views/transaction/transaction_master.dart';
+
+import '../views/transaction-group/transaction_group_master.dart';
+import '../views/transaction/transaction_master.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -39,6 +41,7 @@ class _MainScreenState extends State<MainScreen> {
         onPageChanged: _onPageChanged,
         children: const [
           TransactionMasterView(),
+          TransactionGroupMasterView(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
