@@ -6,39 +6,55 @@ import 'package:sqflite/sqflite.dart';
 
 class DataContext {
   DataContext._();
+
   static final DataContext instance = DataContext._();
 
   static Database? _database;
+
   Future<Database> get database async => _database ??= await _initDatabase();
 
   Future<Database> _initDatabase() async {
     var databasesPath = await getDatabasesPath();
     var path = join(databasesPath, "data.db");
-    // await File(path).delete();
 
-    // Check if the database exists
-    var exists = await databaseExists(path);
-
-    if (!exists) {
-      // Should happen only the first time you launch your application
-      print("Creating new copy from asset");
-
+    if (!await databaseExists(path)) {
       // Make sure the parent directory exists
       try {
         await Directory(dirname(path)).create(recursive: true);
       } catch (_) {}
 
       // Copy from asset
-      ByteData data =
-          await rootBundle.load(url.join("assets", "db", "data.db"));
-      List<int> bytes =
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      final data = await rootBundle.load(url.join("assets", "db", "data.db"));
+      final bytes = data.buffer.asUint8List();
 
       // Write and flush the bytes written
-      await File(path).writeAsBytes(bytes, flush: true);
-    } else {
-      print("Opening existing database");
+      await File(path).writeAsBytes(bytes);
     }
-    return await openDatabase(path);
+
+    return await openDatabase(
+      path,
+      version: 1,
+      onUpgrade: (database, oldVersion, newVersion) async {
+        for (var i = oldVersion; i < newVersion; i++) {
+          String script = await _loadMigrationScript(i);
+
+          // Extract individual commands as sqflite does not support executing multiple commands
+          final commands = script
+              .split(";")
+              .map((cmd) => cmd.trim())
+              .where((cmd) => cmd.isNotEmpty);
+
+          // Execute
+          for (var cmd in commands) {
+            await database.execute(cmd);
+          }
+        }
+      },
+    );
+  }
+
+  Future<String> _loadMigrationScript(int version) async {
+    return await rootBundle.loadString(url.join(
+        "assets", "migrations", "migration_v${version}_${version + 1}.sql"));
   }
 }
