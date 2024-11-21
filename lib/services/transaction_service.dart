@@ -23,6 +23,7 @@ class TransactionService with ChangeNotifier {
     final TransactionDAO transactionDAO = TransactionDAO(
       amount: transaction.amount,
       title: transaction.title,
+      description: transaction.description,
       time: transaction.time.toString(),
       transactionStateId: transaction.transactionStateId,
       createdAt: DateTime.now().toString(),
@@ -36,6 +37,7 @@ class TransactionService with ChangeNotifier {
       id: transaction.id,
       amount: transaction.amount,
       title: transaction.title,
+      description: transaction.description,
       time: transaction.time.toString(),
       transactionStateId: transaction.transactionStateId,
       createdAt: transaction.createdAt.toString(),

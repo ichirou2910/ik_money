@@ -187,6 +187,7 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                       id: widget.transactionId,
                       amount: int.parse(_amountController.text),
                       title: _titleController.text,
+                      description: _descriptionController.text,
                       time: dateFormat.parse(_timeController.text),
                       transactionStateId: _isPending ? 0 : 1,
                     );

@@ -76,6 +76,21 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
         child: Column(
           children: [
+            // Title
+            Row(
+              children: [
+                Text(
+                  data.title,
+                  style: const TextStyle(fontSize: 17),
+                ),
+              ],
+            ),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 10.0),
+              child: DottedLine(
+                dashColor: Theme.of(context).dividerColor,
+              ),
+            ),
             // Amount
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,21 +145,23 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
                 ),
               ],
             ),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 10.0),
-              child: DottedLine(
-                dashColor: Theme.of(context).dividerColor,
-              ),
-            ),
-            // Description
-            Row(
-              children: [
-                Text(
-                  data.title,
-                  style: const TextStyle(fontSize: 17),
+            if (data.description.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10.0),
+                child: DottedLine(
+                  dashColor: Theme.of(context).dividerColor,
                 ),
-              ],
-            )
+              ),
+            // Description
+            if (data.description.isNotEmpty)
+              Row(
+                children: [
+                  Text(
+                    data.description,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                ],
+              )
           ],
         ),
       ),
@@ -198,7 +215,7 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
               },
             ),
           )
-        : const SizedBox(height: 0);
+        : const SizedBox.shrink();
   }
 
   Widget _buildGroups(List<TransactionTransactionGroupMapping> mappings) {
@@ -238,6 +255,6 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
               ],
             ),
           )
-        : Container();
+        : const SizedBox.shrink();
   }
 }
