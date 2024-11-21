@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../views/settings/settings_screen.dart';
 import '../views/transaction-group/transaction_group_master.dart';
 import '../views/transaction/transaction_master.dart';
 
@@ -11,7 +12,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController(initialPage: 0);
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -42,6 +43,8 @@ class _MainScreenState extends State<MainScreen> {
         children: const [
           TransactionMasterView(),
           TransactionGroupMasterView(),
+          TransactionMasterView(),
+          SettingsView(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -58,9 +61,14 @@ class _MainScreenState extends State<MainScreen> {
             icon: Icon(Icons.label),
             label: 'Labels',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
       ),
     );

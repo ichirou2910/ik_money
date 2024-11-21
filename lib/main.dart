@@ -7,6 +7,7 @@ import '../services/transaction_group_service.dart';
 import '../services/transaction_service.dart';
 import '../theme/theme_config.dart';
 import '../views/main_screen.dart';
+import '../views/settings/settings_screen.dart';
 import '../views/transaction/transaction_detail.dart';
 import '../views/transaction/transaction_preview.dart';
 
@@ -32,6 +33,10 @@ class MyApp extends StatelessWidget {
         GoRoute(
           path: '/',
           builder: (ctx, state) => const MainScreen(),
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (ctx, state) => const SettingsView(),
         ),
         GoRoute(
             path: '/transaction-edit/:transactionId',
