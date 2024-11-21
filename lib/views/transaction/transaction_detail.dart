@@ -58,37 +58,65 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
 
   Future<void> _confirmDelete(BuildContext context) async {
     return showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: const Text("Delete transaction"),
-              content: const Text(
-                  "Are you sure you want to delete this transaction?"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    context.pop();
-                  },
-                  child: const Text("Cancel"),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    context.pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      _buildSnackbar("Deleting..."),
-                    );
-                    await Provider.of<TransactionService>(context,
-                            listen: false)
-                        .delete(widget.transactionId);
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      context.pop();
-                      context.pop();
-                    }
-                  },
-                  child: const Text("Delete"),
-                ),
-              ],
-            ));
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete transaction"),
+        content: const Text("Are you sure you want to continue?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              context.pop();
+            },
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              context.pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                _buildSnackbar("Deleting..."),
+              );
+              await Provider.of<TransactionService>(context, listen: false)
+                  .delete(widget.transactionId);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                context.pop();
+                context.pop();
+              }
+            },
+            child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleSubmit(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        _buildSnackbar("Saving..."),
+      );
+
+      final Transaction transaction = Transaction(
+        id: widget.transactionId,
+        amount: int.parse(_amountController.text),
+        title: _titleController.text,
+        description: _descriptionController.text,
+        time: dateFormat.parse(_timeController.text),
+        transactionStateId: _isPending ? 0 : 1,
+      );
+      if (transaction.id > 0) {
+        await Provider.of<TransactionService>(context, listen: false)
+            .update(transaction);
+      } else {
+        await Provider.of<TransactionService>(context, listen: false)
+            .create(transaction);
+      }
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+        context.pop();
+      }
+    }
   }
 
   @override
@@ -99,14 +127,17 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
         title: widget.transactionId > 0
             ? const Text("Edit Transaction")
             : const Text("New Transaction"),
-        actions: widget.transactionId > 0
-            ? [
-                IconButton(
-                  onPressed: () => _confirmDelete(context),
-                  icon: const Icon(Icons.delete),
-                ),
-              ]
-            : [],
+        actions: [
+          if (widget.transactionId > 0)
+            IconButton(
+              onPressed: () => _confirmDelete(context),
+              icon: const Icon(Icons.delete),
+            ),
+          IconButton(
+            onPressed: () => _handleSubmit(context),
+            icon: const Icon(Icons.check),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -175,39 +206,6 @@ class _TransactionDetailViewState extends State<TransactionDetailView> {
                     _isPending = newValue ?? false;
                   });
                 },
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      _buildSnackbar("Saving..."),
-                    );
-
-                    final Transaction transaction = Transaction(
-                      id: widget.transactionId,
-                      amount: int.parse(_amountController.text),
-                      title: _titleController.text,
-                      description: _descriptionController.text,
-                      time: dateFormat.parse(_timeController.text),
-                      transactionStateId: _isPending ? 0 : 1,
-                    );
-                    if (transaction.id > 0) {
-                      await Provider.of<TransactionService>(context,
-                              listen: false)
-                          .update(transaction);
-                    } else {
-                      await Provider.of<TransactionService>(context,
-                              listen: false)
-                          .create(transaction);
-                    }
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      context.pop();
-                    }
-                  }
-                },
-                child: const Text('Submit'),
               ),
             ],
           ),
