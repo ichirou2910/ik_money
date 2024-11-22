@@ -49,16 +49,11 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildInfoCard(snap.data as Transaction),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
+                        _buildInfoCard(snap.data!),
+                        _buildDescription(snap.data!.description),
                         _buildLabels(
                             snap.data?.transactionTransactionLabelMappings
                                 as List<TransactionTransactionLabelMapping>),
-                        const SizedBox(
-                          height: 10.0,
-                        ),
                         _buildGroups(
                             snap.data?.transactionTransactionGroupMappings
                                 as List<TransactionTransactionGroupMapping>),
@@ -145,116 +140,134 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
                 ),
               ],
             ),
-            if (data.description.isNotEmpty)
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10.0),
-                child: DottedLine(
-                  dashColor: Theme.of(context).dividerColor,
-                ),
-              ),
-            // Description
-            if (data.description.isNotEmpty)
-              Row(
-                children: [
-                  Text(
-                    data.description,
-                    style: const TextStyle(fontSize: 17),
-                  ),
-                ],
-              )
           ],
         ),
       ),
     );
   }
 
+  // Description with any monetary value highlighted
+  Widget _buildDescription(String description) {
+    if (description.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final moneyRegex = RegExp(
+      r'(?:\b(?:USD|EUR|GBP|JPY|VND|dollars?|euros?|pounds?|yen|dong)\b|\p{Sc})\s?\d+(?:,\d{3})*(?:\.\d{1,2})?',
+      unicode: true,
+    );
+
+    final matches = moneyRegex.allMatches(description);
+    int currentMatchIndex = 0;
+
+    List<TextSpan> spans = [];
+    for (Match match in matches) {
+      // Add text before the match
+      if (currentMatchIndex < match.start) {
+        spans.add(
+          TextSpan(
+            text: description.substring(currentMatchIndex, match.start),
+          ),
+        );
+      }
+
+      spans.add(
+        TextSpan(
+          text: description.substring(match.start, match.end),
+          style: const TextStyle(
+            color: Colors.blue,
+          ),
+        ),
+      );
+
+      currentMatchIndex = match.end;
+    }
+
+    // Add text after the last match
+    if (currentMatchIndex < description.length) {
+      spans.add(
+        TextSpan(
+          text: description.substring(currentMatchIndex),
+          style: const TextStyle(fontSize: 17),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: RichText(
+        text: TextSpan(
+          children: spans,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ),
+    );
+  }
+
   Widget _buildLabels(List<TransactionTransactionLabelMapping> mappings) {
-    return mappings.isNotEmpty
-        ? SizedBox(
-            height: 25.0,
-            child: ListView.builder(
-              primary: false,
-              scrollDirection: Axis.horizontal,
-              itemCount: mappings.length,
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 5.0, vertical: 0.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Color(int.parse(
-                              mappings[index]
-                                  .transactionLabel
-                                  .color
-                                  .substring(1, 7),
-                              radix: 16) +
-                          0xFF000000),
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(20.0),
-                      ),
-                    ),
-                    child: InkWell(
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(20.0),
-                      ),
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                            mappings[index].transactionLabel.code,
-                            style: const TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
+    if (mappings.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      child: Wrap(
+        spacing: 8.0,
+        children: mappings.map((e) {
+          return Chip(
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            shape: const StadiumBorder(),
+            label: Text(
+              e.transactionLabel.code,
+              style: const TextStyle(color: Colors.white),
             ),
-          )
-        : const SizedBox.shrink();
+            backgroundColor: Color(
+                int.parse(e.transactionLabel.color.substring(1, 7), radix: 16) +
+                    0xFF000000),
+          );
+        }).toList(),
+      ),
+    );
   }
 
   Widget _buildGroups(List<TransactionTransactionGroupMapping> mappings) {
-    return mappings.isNotEmpty
-        ? Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              children: [
-                const Text("Transaction Groups"),
-                ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: mappings.length,
-                  itemBuilder: (ctx, idx) {
-                    return InkWell(
-                      onTap: () {
-                        // TODO: navigate to group
-                      },
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(0),
-                        title: Text(
-                          mappings[idx].transactionGroup.name,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 17),
-                        ),
-                        subtitle: Text(
-                            mappings[idx].transactionGroup.description,
-                            style: const TextStyle(fontSize: 12)),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.chevron_right),
-                          onPressed: () {},
-                        ),
-                      ),
-                    );
-                  },
+    if (mappings.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 8, 10, 0),
+      child: Column(
+        children: [
+          const Text("Transaction Groups"),
+          ListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: mappings.length,
+            itemBuilder: (ctx, idx) {
+              return InkWell(
+                onTap: () {
+                  // TODO: navigate to group
+                },
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(0),
+                  title: Text(
+                    mappings[idx].transactionGroup.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 17),
+                  ),
+                  subtitle: Text(mappings[idx].transactionGroup.description,
+                      style: const TextStyle(fontSize: 12)),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.chevron_right),
+                    onPressed: () {},
+                  ),
                 ),
-              ],
-            ),
-          )
-        : const SizedBox.shrink();
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
