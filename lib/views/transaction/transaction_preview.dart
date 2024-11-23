@@ -9,6 +9,7 @@ import '../../entities/transaction_state.dart';
 import '../../entities/transaction_transaction_group_mapping.dart';
 import '../../entities/transaction_transaction_label_mapping.dart';
 import '../../services/transaction_service.dart';
+import '../../utils/helper.dart';
 
 class TransactionPreviewView extends StatefulWidget {
   final int transactionId;
@@ -95,8 +96,7 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
                   style: TextStyle(fontSize: 17),
                 ),
                 Text(
-                  NumberFormat.simpleCurrency(locale: 'vi_VN', decimalDigits: 0)
-                      .format(data.amount),
+                  Helper.formatCurrency(data.amount),
                   style: TextStyle(
                     fontSize: 17,
                     color: (data.amount) > 0 ? Colors.green : Colors.red,
@@ -153,7 +153,7 @@ class _TransactionPreviewViewState extends State<TransactionPreviewView> {
     }
 
     final moneyRegex = RegExp(
-      r'(?:\b(?:USD|EUR|GBP|JPY|VND|dollars?|euros?|pounds?|yen|dong)\b|\p{Sc})\s?\d+(?:,\d{3})*(?:\.\d{1,2})?',
+      r'(?:\b(?:USD|EUR|GBP|JPY|VND)\b|\p{Sc})\s?\d+(?:,\d{3})*(?:\.\d{1,2})?',
       unicode: true,
     );
 
