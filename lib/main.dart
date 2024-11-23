@@ -18,7 +18,9 @@ void main() {
       ChangeNotifierProvider(create: (_) => TransactionService()),
       ChangeNotifierProvider(create: (_) => TransactionGroupService()),
     ],
-    child: const MyApp(),
+    builder: (context, child) {
+      return const MyApp();
+    },
   ));
 }
 
